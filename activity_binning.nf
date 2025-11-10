@@ -1,6 +1,7 @@
 process activity_binning {
 
-    errorStrategy 'ignore' //TODO: remove this line when debugging is done
+    //errorStrategy 'ignore' //TODO: remove this line when debugging is done
+    errorStrategy 'finish'
     publishDir "${params.activity_binning.publishDir}", mode: 'copy'
 
     input:
@@ -10,7 +11,8 @@ process activity_binning {
     output:
     path "${params.activity_binning.out_dir_activity}/*${params.activity_binning.out_extension}", emit: lsi_activity_files //wait until all files are generated?
     path "${params.activity_binning.out_dir_activity}", emit: lsi_activity_path //needed as input for random forest
-    path "${params.activity_binning.test_cells_file}", emit: test_cells_file ///needed as input for random forest
+    //path "${params.activity_binning.test_cells_file}", emit: test_cells_file ///needed as input for random forest
+    path "test_*.txt", optional: true, emit: test_cells_file ///needed as input for random forest
 
     script:
     """
@@ -43,6 +45,5 @@ process activity_binning {
         seed = ${params.activity_binning.seed})
     """
 }
-
 
  
