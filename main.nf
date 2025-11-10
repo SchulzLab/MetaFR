@@ -39,14 +39,11 @@ workflow {
             metacell_filtering_out.rna_data
             
         )
-        activity_binning_out.lsi_activity_files.view()
-        activity_binning_out.lsi_activity_path.view()
-        activity_binning_out.test_cells_file.view()
 
-        random_forest(
-            activity_binning_out.lsi_activity_files,
-            activity_binning_out.test_cells_file
-        )
+        //random_forest(
+        //    activity_binning_out.lsi_activity_files,
+        //    activity_binning_out.test_cells_file
+        //)
 
     } else {
         metacell_filtering_out = metacell_filtering(
@@ -64,16 +61,35 @@ workflow {
             metacell_filtering_out.rna_counts
             
         )
-        activity_binning_out.lsi_activity_files.view()
-        activity_binning_out.lsi_activity_path.view()
-        activity_binning_out.test_cells_file.view()
 
-        random_forest(
-            activity_binning_out.lsi_activity_files,
-            activity_binning_out.test_cells_file
-        )
+        //activity_binning_out.lsi_activity_files.view()
+        //activity_binning_out.lsi_activity_path.view()
+        //activity_binning_out.test_cells_file.view()
+
+        //def test_cells_val = activity_binning_out.test_cells_file.first() //get the single value from the channel
+
+        //random_forest(
+        //   activity_binning_out.lsi_activity_files,
+        //    test_cells_val
+        //)
        
     }
 
+    test_cells_ch = Channel.empty()
+    if (params.activity_binning.test_partition_flag.toString().toLowerCase() == 'true') {
+        test_cells_ch = activity_binning_out.test_cells_file
+    } else {
+        test_cells_ch = Channel.fromPath(params.activity_binning.test_cells_file, checkIfExists: true)
+    }
+
+        activity_binning_out.lsi_activity_files.view()
+        activity_binning_out.lsi_activity_path.view()
+        test_cells_ch.view()
+
+
+    activity_binning_out.lsi_activity_files
+        .combine(test_cells_ch)
+        | random_forest
     
 }
+
